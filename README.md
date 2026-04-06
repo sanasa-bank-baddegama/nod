@@ -175,7 +175,7 @@ Looking at PostgreSQL with UUID primary keys.
 
 ## Statuses
 
-`todo` → `in-progress` → `done` · also: `blocked`, `cancelled`
+`todo` → `in-progress` → `done` · also: `backlog`, `cancelled`
 
 ## Priorities
 
