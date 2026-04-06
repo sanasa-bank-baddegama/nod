@@ -10,7 +10,7 @@ export const initCommand = new Command('init')
     const root = process.cwd();
     const nodDir = path.join(root, '.nod');
     const configPath = path.join(nodDir, 'config.json');
-    const tasksDir = path.join(root, 'tasks');
+    const tasksDir = path.join(nodDir, 'tasks');
 
     if (fs.existsSync(configPath)) {
       console.log(chalk.yellow('Already a nod project.') + ` Config: ${configPath}`);

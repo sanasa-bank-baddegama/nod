@@ -4,7 +4,7 @@ import { parseFile, parseFullFile, serializeTask, buildInitialBody } from '../ut
 import type { Task, TaskFrontmatter, TaskSummary } from './types.ts';
 import { NotFoundError } from '../utils/errors.ts';
 
-const TASKS_DIR = 'tasks';
+const TASKS_DIR = '.nod/tasks';
 
 export function tasksDir(root: string): string {
   return path.join(root, TASKS_DIR);

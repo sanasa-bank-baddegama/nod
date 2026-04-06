@@ -14,13 +14,15 @@ npm install -g @onmyway133/nod
 
 ## How it works
 
-Each task lives in its own `.md` file inside a `tasks/` folder:
+Each task lives in its own `.md` file inside `.nod/tasks/`:
 
 ```
-tasks/
-  epic-1-onboarding.md
-  task-2-setup-database.md
-  subtask-3-write-migrations.md
+.nod/
+  config.json
+  tasks/
+    epic-1-onboarding.md
+    task-2-setup-database.md
+    subtask-3-write-migrations.md
 ```
 
 Tasks have a YAML header with fields like status, priority, and parent. The rest of the file is free-form markdown — description, notes, work log, anything you want.
@@ -46,7 +48,7 @@ nod ui               # open Kanban board in browser
 ## Commands
 
 ### `nod init`
-Set up a nod project in the current directory. Creates `.nod/` and `tasks/`.
+Set up a nod project in the current directory. Creates `.nod/` with `config.json` and a `tasks/` subfolder inside it.
 
 ### `nod create <type> <title>`
 Create a task. Types: `epic`, `task`, `subtask`, `bug`.
@@ -137,7 +139,7 @@ nod open task-2
 ```
 
 ### `nod ui`
-Open a Kanban board in the browser at `http://localhost:7777`. Reflects the current state of your `tasks/` folder and auto-refreshes every 3 seconds.
+Open a Kanban board in the browser at `http://localhost:7777`. Reflects the current state of your `.nod/tasks/` folder and auto-refreshes every 3 seconds.
 
 ```bash
 nod ui
