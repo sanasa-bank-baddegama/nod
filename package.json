@@ -1,0 +1,49 @@
+{
+  "name": "@onmyway133/nod",
+  "version": "1.0.0",
+  "author": {
+    "name": "Khoa Pham",
+    "email": "onmyway133@gmail.com"
+  },
+  "description": "Markdown task manager — each task is a git-friendly .md file, designed for Claude Code",
+  "keywords": [
+    "task-manager",
+    "markdown",
+    "kanban",
+    "cli",
+    "claude-code",
+    "bun"
+  ],
+  "homepage": "https://github.com/onmyway133/nod",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/onmyway133/nod.git"
+  },
+  "license": "MIT",
+  "bin": {
+    "nod": "./dist/nod.js"
+  },
+  "files": [
+    "dist/nod.js"
+  ],
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "build": "bun run scripts/build.ts",
+    "prepublishOnly": "bun run build && bun test",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "typescript": "^5.4.0"
+  }
+}

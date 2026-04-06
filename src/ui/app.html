@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nod — Kanban</title>
+  <style>
+    :root {
+      --todo: #6b7280;
+      --in-progress: #d97706;
+      --blocked: #dc2626;
+      --done: #16a34a;
+      --cancelled: #9ca3af;
+
+      --epic: #ea580c;
+      --task: #2563eb;
+      --subtask: #7c3aed;
+      --bug: #dc2626;
+
+      --critical: #dc2626;
+      --high: #ea580c;
+      --medium: #ca8a04;
+      --low: #6b7280;
+
+      --bg: #f9fafb;
+      --col-bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    header .brand {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    header .meta {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    header .project-path {
+      font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+      font-size: 11px;
+    }
+
+    .board-wrapper {
+      flex: 1;
+      overflow-x: auto;
+      padding: 20px;
+    }
+
+    .board {
+      display: flex;
+      gap: 16px;
+      height: 100%;
+      min-width: max-content;
+    }
+
+    .column {
+      width: 280px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .column-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--col-bg);
+      border-radius: var(--radius);
+      border-left: 3px solid currentColor;
+    }
+
+    .column-header .col-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex: 1;
+    }
+
+    .column-header .count {
+      font-size: 12px;
+      font-weight: 600;
+      background: currentColor;
+      color: #fff;
+      border-radius: 10px;
+      padding: 1px 7px;
+      opacity: 0.85;
+    }
+
+    .col-blocked  .column-header { color: var(--blocked); }
+    .col-todo     .column-header { color: var(--todo); }
+    .col-in-progress .column-header { color: var(--in-progress); }
+    .col-done     .column-header { color: var(--done); }
+    .col-cancelled .column-header { color: var(--cancelled); }
+
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      transition: box-shadow 0.15s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 3px 8px rgba(0,0,0,0.10);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+
+    .card-id {
+      font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .badges {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      color: #fff;
+      white-space: nowrap;
+      letter-spacing: 0.2px;
+    }
+
+    .badge-epic     { background: var(--epic); }
+    .badge-task     { background: var(--task); }
+    .badge-subtask  { background: var(--subtask); }
+    .badge-bug      { background: var(--bug); }
+
+    .badge-critical { background: var(--critical); }
+    .badge-high     { background: var(--high); }
+    .badge-medium   { background: var(--medium); }
+    .badge-low      { background: var(--low); }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .parent-ref {
+      font-size: 10px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .parent-ref::before {
+      content: '↑';
+      font-size: 10px;
+    }
+
+    .tag {
+      font-size: 10px;
+      padding: 1px 6px;
+      background: #e5e7eb;
+      color: #374151;
+      border-radius: 20px;
+    }
+
+    .status-btn {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+      margin-left: auto;
+    }
+
+    .status-btn:hover { opacity: 0.8; transform: scale(1.05); }
+    .status-btn:active { transform: scale(0.97); }
+
+    .status-btn.todo     { background: var(--todo); }
+    .status-btn.in-progress { background: var(--in-progress); }
+    .status-btn.blocked  { background: var(--blocked); }
+    .status-btn.done     { background: var(--done); }
+    .status-btn.cancelled { background: var(--cancelled); }
+
+    .empty-col {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      padding: 16px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+    }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .error-banner {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 10px 20px;
+      font-size: 13px;
+      border-bottom: 1px solid #fca5a5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="brand">nod</span>
+    <div class="meta">
+      <span class="project-path" id="project-path">—</span>
+      <span id="last-updated">loading…</span>
+    </div>
+  </header>
+
+  <div id="error-container"></div>
+
+  <div class="board-wrapper" id="board-wrapper">
+    <div class="loading">Loading tasks…</div>
+  </div>
+
+  <script>
+    const COLUMNS = [
+      { key: 'blocked',     label: 'Blocked',     cls: 'col-blocked' },
+      { key: 'todo',        label: 'Todo',         cls: 'col-todo' },
+      { key: 'in-progress', label: 'In Progress',  cls: 'col-in-progress' },
+      { key: 'done',        label: 'Done',         cls: 'col-done' },
+      { key: 'cancelled',   label: 'Cancelled',    cls: 'col-cancelled' },
+    ];
+
+    const STATUS_CYCLE = {
+      'todo':        'in-progress',
+      'in-progress': 'done',
+      'done':        'todo',
+      'blocked':     'todo',
+      'cancelled':   'todo',
+    };
+
+    const STATUS_LABELS = {
+      'todo':        'Todo',
+      'in-progress': 'In Progress',
+      'blocked':     'Blocked',
+      'done':        'Done',
+      'cancelled':   'Cancelled',
+    };
+
+    let allTasks = [];
+    let projectRoot = '';
+
+    function esc(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderCard(task) {
+      const tags = (task.tags ?? []).map(t => `<span class="tag">${esc(t)}</span>`).join('');
+      const parent = task.parent
+        ? `<span class="parent-ref">${esc(task.parent)}</span>`
+        : '';
+
+      const nextStatus = STATUS_CYCLE[task.status] ?? 'todo';
+      const nextLabel = STATUS_LABELS[nextStatus] ?? nextStatus;
+
+      return `
+        <div class="card" data-id="${esc(task.id)}">
+          <div class="card-top">
+            <span class="card-id">${esc(task.id)}</span>
+            <div class="badges">
+              <span class="badge badge-${esc(task.type)}">${esc(task.type)}</span>
+              <span class="badge badge-${esc(task.priority)}">${esc(task.priority)}</span>
+            </div>
+          </div>
+          <div class="card-title">${esc(task.title)}</div>
+          <div class="card-footer">
+            ${parent}
+            ${tags}
+            <button
+              class="status-btn ${esc(task.status)}"
+              data-id="${esc(task.id)}"
+              data-next="${esc(nextStatus)}"
+              title="Click to advance status"
+            >${esc(nextLabel)}</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderBoard(tasks) {
+      const byStatus = {};
+      for (const col of COLUMNS) byStatus[col.key] = [];
+      for (const t of tasks) {
+        if (byStatus[t.status]) byStatus[t.status].push(t);
+      }
+
+      const boardHtml = COLUMNS.map(col => {
+        const colTasks = byStatus[col.key] ?? [];
+        const cards = colTasks.length
+          ? colTasks.map(renderCard).join('')
+          : '<div class="empty-col">No tasks</div>';
+
+        return `
+          <div class="column ${esc(col.cls)}">
+            <div class="column-header">
+              <span class="col-title">${esc(col.label)}</span>
+              <span class="count">${colTasks.length}</span>
+            </div>
+            <div class="cards">${cards}</div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('board-wrapper').innerHTML =
+        `<div class="board">${boardHtml}</div>`;
+
+      // Attach click handlers
+      document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          const next = btn.dataset.next;
+          await updateTask(id, 'status', next);
+        });
+      });
+    }
+
+    async function fetchTasks() {
+      try {
+        const res = await fetch('/api/tasks');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        allTasks = data.tasks ?? [];
+        projectRoot = data.root ?? '';
+        document.getElementById('project-path').textContent = projectRoot;
+        document.getElementById('last-updated').textContent =
+          'Updated ' + new Date().toLocaleTimeString();
+        document.getElementById('error-container').innerHTML = '';
+        renderBoard(allTasks);
+      } catch (err) {
+        document.getElementById('error-container').innerHTML =
+          `<div class="error-banner">Error fetching tasks: ${esc(err.message)}</div>`;
+      }
+    }
+
+    async function updateTask(id, field, value) {
+      try {
+        const res = await fetch('/api/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, field, value }),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error ?? `HTTP ${res.status}`);
+        }
+        await fetchTasks();
+      } catch (err) {
+        document.getElementById('error-container').innerHTML =
+          `<div class="error-banner">Error updating task: ${esc(err.message)}</div>`;
+      }
+    }
+
+    // Initial load
+    fetchTasks();
+
+    // Auto-refresh every 3 seconds
+    setInterval(fetchTasks, 3000);
+  </script>
+</body>
+</html>
