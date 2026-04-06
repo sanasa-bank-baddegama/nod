@@ -17,7 +17,7 @@ async function withTempProject(fn: (root: string) => Promise<void>) {
       path.join(root, '.nod', 'config.json'),
       JSON.stringify({ counter: 0, version: '1' })
     );
-    fs.mkdirSync(path.join(root, 'tasks'));
+    fs.mkdirSync(path.join(root, '.nod', 'tasks'));
     await fn(root);
   } finally {
     fs.rmSync(root, { recursive: true });

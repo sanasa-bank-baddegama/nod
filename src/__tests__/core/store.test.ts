@@ -24,7 +24,7 @@ async function withTempProject(fn: (root: string) => Promise<void>) {
       path.join(root, '.nod', 'config.json'),
       JSON.stringify({ counter: 0, version: '1' })
     );
-    fs.mkdirSync(path.join(root, 'tasks'));
+    fs.mkdirSync(path.join(root, '.nod', 'tasks'));
     await fn(root);
   } finally {
     fs.rmSync(root, { recursive: true });
@@ -55,7 +55,7 @@ describe('createTask', () => {
       const filename = 'task-1-test-task.md';
       createTask(root, fm, filename);
 
-      const filePath = path.join(root, 'tasks', filename);
+      const filePath = path.join(root, '.nod', 'tasks', filename);
       expect(fs.existsSync(filePath)).toBe(true);
     });
   });
@@ -112,7 +112,7 @@ describe('loadAllSummaries', () => {
       // Write a valid task
       createTask(root, makeFrontmatter({ id: 'task-1', title: 'Valid' }), 'task-1-valid.md');
       // Write an invalid markdown file (no frontmatter)
-      fs.writeFileSync(path.join(root, 'tasks', 'garbage.md'), 'not frontmatter\njust text\n');
+      fs.writeFileSync(path.join(root, '.nod', 'tasks', 'garbage.md'), 'not frontmatter\njust text\n');
 
       const summaries = loadAllSummaries(root);
       // Only the valid one
