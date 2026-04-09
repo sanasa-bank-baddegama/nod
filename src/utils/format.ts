@@ -63,6 +63,17 @@ export function buildInitialBody(title: string, body?: string): string {
   return `# ${title}\n\n${content}\n## Notes\n\n\n## Work Log\n\n`;
 }
 
+export function replaceBodyContent(existingBody: string, newContent: string): string {
+  // Preserve ## Notes and ## Work Log sections; replace only the description content
+  const notesIdx = existingBody.indexOf('\n## Notes');
+  const suffix = notesIdx !== -1 ? existingBody.slice(notesIdx) : '\n## Notes\n\n\n## Work Log\n\n';
+  // Find where the title line ends (first \n after # heading)
+  const titleEnd = existingBody.indexOf('\n', existingBody.indexOf('#'));
+  const titleLine = titleEnd !== -1 ? existingBody.slice(0, titleEnd + 1) : '';
+  const content = newContent ? '\n' + newContent.trimEnd() + '\n' : '\n';
+  return `${titleLine}${content}${suffix}`;
+}
+
 function isValidFrontmatter(data: unknown): data is TaskFrontmatter {
   if (!data || typeof data !== 'object') return false;
   const d = data as Record<string, unknown>;

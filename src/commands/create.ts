@@ -15,7 +15,13 @@ export const createCommand = new Command('create')
   .option('-t, --tags <tags>', 'Comma-separated tags')
   .option(
     '--body <text>',
-    'Markdown body for the task. Write detailed content: goal, background, acceptance criteria, steps, open questions, todo lists (- [ ] item). Agents should use this to document intent and breakdown — not just a one-liner.',
+    'Markdown body for the task. Suggested structure:\n' +
+    '  **Problem** — what needs to be done and why\n' +
+    '  **Root Causes** (bug fix) or **Requirements** (feature)\n' +
+    '  **Solution** — approach, key decisions, code patterns to follow\n' +
+    '  **Files to Change** — table of file paths and what changes\n' +
+    '  **TODO** — checklist of remaining steps (- [ ] item)\n' +
+    '  **Work Log** — date-stamped progress notes',
   )
   .action((type: string, title: string, opts) => {
     if (!TASK_TYPES.includes(type as TaskType)) {

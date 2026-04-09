@@ -5,6 +5,7 @@ import { findNodRoot, generateFilename } from '../core/id.ts';
 import { findById, loadTask, writeTask, renameTask } from '../core/store.ts';
 import type { Status, Priority } from '../core/types.ts';
 import { STATUSES, PRIORITIES } from '../core/types.ts';
+import { replaceBodyContent } from '../utils/format.ts';
 import { ValidationError } from '../utils/errors.ts';
 
 export const updateCommand = new Command('update')
@@ -16,6 +17,17 @@ export const updateCommand = new Command('update')
   .option('--tags <tags>', 'Replace tags (comma-separated)')
   .option('--parent <id>', 'Set parent task ID')
   .option('--related <ids>', 'Set related task IDs (comma-separated)')
+  .option(
+    '--body <text>',
+    'Replace the task description body. Suggested structure:\n' +
+    '  **Problem** — what needs to be done and why\n' +
+    '  **Root Causes** (bug fix) or **Requirements** (feature)\n' +
+    '  **Solution** — approach, key decisions, code patterns to follow\n' +
+    '  **Files to Change** — table of file paths and what changes\n' +
+    '  **TODO** — checklist of remaining steps (- [ ] item)\n' +
+    '  **Work Log** — date-stamped progress notes\n' +
+    'Preserves ## Notes and ## Work Log sections.',
+  )
   .action((id: string, opts) => {
     if (opts.status && !STATUSES.includes(opts.status as Status)) {
       throw new ValidationError(`Invalid status "${opts.status}". Must be one of: ${STATUSES.join(', ')}`);
@@ -50,6 +62,10 @@ export const updateCommand = new Command('update')
       const tags = (opts.tags as string).split(',').map((s: string) => s.trim()).filter(Boolean);
       task = { ...task, tags: tags.length ? tags : undefined };
       changes.push(`tags updated`);
+    }
+    if (opts.body !== undefined) {
+      task = { ...task, body: replaceBodyContent(task.body, opts.body as string) };
+      changes.push(`body updated`);
     }
 
     const titleChanged = opts.title && opts.title !== task.title;
