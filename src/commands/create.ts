@@ -13,6 +13,10 @@ export const createCommand = new Command('create')
   .option('-p, --priority <priority>', 'Priority: critical, high, medium, low', 'medium')
   .option('--parent <id>', 'Parent task ID')
   .option('-t, --tags <tags>', 'Comma-separated tags')
+  .option(
+    '--body <text>',
+    'Markdown body for the task. Write detailed content: goal, background, acceptance criteria, steps, open questions, todo lists (- [ ] item). Agents should use this to document intent and breakdown — not just a one-liner.',
+  )
   .action((type: string, title: string, opts) => {
     if (!TASK_TYPES.includes(type as TaskType)) {
       throw new ValidationError(`Invalid type "${type}". Must be one of: ${TASK_TYPES.join(', ')}`);
@@ -65,7 +69,7 @@ export const createCommand = new Command('create')
       ...(tags && tags.length ? { tags } : {}),
     };
 
-    const task = createTask(root, frontmatter, filename);
+    const task = createTask(root, frontmatter, filename, opts.body as string | undefined);
     console.log(chalk.green(`Created ${id}`) + ` → .nod/tasks/${filename}`);
     if (opts.parent) {
       console.log(chalk.dim(`  Parent: ${opts.parent}`));

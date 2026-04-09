@@ -56,7 +56,8 @@ export function writeTask(task: Task): void {
 export function createTask(
   root: string,
   frontmatter: TaskFrontmatter,
-  filename: string
+  filename: string,
+  body?: string
 ): Task {
   const dir = tasksDir(root);
   if (!fs.existsSync(dir)) {
@@ -64,8 +65,8 @@ export function createTask(
   }
 
   const filePath = path.join(dir, filename);
-  const body = buildInitialBody(frontmatter.title);
-  const task: Task = { ...frontmatter, body, filePath };
+  const initialBody = buildInitialBody(frontmatter.title, body);
+  const task: Task = { ...frontmatter, body: initialBody, filePath };
   fs.writeFileSync(filePath, serializeTask(task), 'utf8');
   return task;
 }

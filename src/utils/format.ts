@@ -58,8 +58,9 @@ export function serializeTask(task: Task): string {
   return `---\n${yamlStr}---\n${task.body}`;
 }
 
-export function buildInitialBody(title: string): string {
-  return `# ${title}\n\n\n## Notes\n\n\n## Work Log\n\n`;
+export function buildInitialBody(title: string, body?: string): string {
+  const content = body ? body.trimEnd() + '\n' : '';
+  return `# ${title}\n\n${content}\n## Notes\n\n\n## Work Log\n\n`;
 }
 
 function isValidFrontmatter(data: unknown): data is TaskFrontmatter {
